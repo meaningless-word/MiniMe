@@ -1,0 +1,17 @@
+{% extends 'default.html' %}
+
+{% block title %}
+Chats
+{% endblock title %}
+
+{% block content %}
+    {% if chats %}
+        {% for c in chats %}
+            <p>{{ c.title }}</p>
+        {% endfor %}
+    {% else %}
+        <h3>пока ничего нет</h3>
+    {% endif %}
+
+    <a href="{% url 'logout' %}">Logout</a>
+{% endblock content %}
