@@ -42,6 +42,14 @@ class ChatSerializer(serializers.HyperlinkedModelSerializer):
         return instance
 
 
+class MessageSerializer(serializers.ModelSerializer):
+    author = serializers.PrimaryKeyRelatedField(queryset=User.objects.all())
+    chat = serializers.PrimaryKeyRelatedField(queryset=Chat.objects.all())
+    dateCreation = serializers.DateTimeField(read_only=True)
+
+    class Meta:
+        model = Message
+        fields = ['id', 'text', 'author', 'chat', 'deleted', 'dateCreation']
 
 
 
