@@ -15,4 +15,8 @@ class Message(models.Model):
     text = models.TextField()
     dateCreation = models.DateTimeField(auto_now_add=True)
     author = models.ForeignKey(User, on_delete=models.CASCADE)
-    room = models.ForeignKey(Chat, on_delete=models.CASCADE)
+    chat = models.ForeignKey(Chat, on_delete=models.CASCADE)
+    deleted = models.BooleanField(default=False)
+
+    def __str__(self):
+        return f'from:{self.author.id} to_chat:{self.chat.id} [{self.text[:50]}'
