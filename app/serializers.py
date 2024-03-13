@@ -8,8 +8,13 @@ class UserSerializer(serializers.ModelSerializer):
         model = User
         fields = ['id', 'username']
 
+    def to_representation(self, instance):
+        data = super().to_representation(instance)
+        data['itsMe'] = data['id'] == self.context['request'].user.id
+        return data
 
-class ChatSerializer(serializers.HyperlinkedModelSerializer):
+
+class ChatSerializer(serializers.ModelSerializer):
     members = serializers.PrimaryKeyRelatedField(many=True, queryset=User.objects.all())
 
     class Meta:
@@ -43,13 +48,16 @@ class ChatSerializer(serializers.HyperlinkedModelSerializer):
 
 
 class MessageSerializer(serializers.ModelSerializer):
-    author = serializers.PrimaryKeyRelatedField(queryset=User.objects.all())
-    chat = serializers.PrimaryKeyRelatedField(queryset=Chat.objects.all())
+    authorName = serializers.ReadOnlyField(source='author.username')
     dateCreation = serializers.DateTimeField(read_only=True)
+    authorizedUser = serializers.ReadOnlyField(default=0, read_only=True)
 
     class Meta:
         model = Message
-        fields = ['id', 'text', 'author', 'chat', 'deleted', 'dateCreation']
+        fields = ['id', 'text', 'author', 'authorName', 'chat', 'deleted', 'dateCreation', 'authorizedUser']
 
-
-
+    def to_representation(self, instance):
+        data = super().to_representation(instance)
+        data['authorizedUser'] = self.context['request'].user.id
+        data['dateCreation'] = instance.dateCreation.strftime("%d.%m.%Y %H:%M")
+        return data

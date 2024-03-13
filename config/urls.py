@@ -26,5 +26,5 @@ urlpatterns = [
     path('accounts/', include('accounts.urls')),
     path('logout/', logout_view, name='logout'),
     path('', include('app.urls')),
-] + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
-
+]
+urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
