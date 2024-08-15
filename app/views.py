@@ -43,6 +43,14 @@ class ChatViewSet(viewsets.ModelViewSet):
     def get_queryset(self):
         queryset = super().get_queryset()
         return queryset.filter(members__in=[self.request.user])
+    
+    def destroy(self, request, *args, **kwargs):
+        instance = self.get_object()
+        instance.members.clear()
+        m = instance.message_set.all()
+        m.delete()
+        instance.delete()
+        return Response(status=status.HTTP_204_NO_CONTENT)
 
 
 class MessageViewSet(viewsets.ModelViewSet):

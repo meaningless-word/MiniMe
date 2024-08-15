@@ -1,51 +1,53 @@
-{% extends 'default.html' %}
+{% extends 'default.html' %} 
 
-{% block title %}
-Chats
-{% endblock title %}
+{% block title %} 
+Chats 
+{% endblock title %} 
 
 {% block content %}
-    <nav>
-        <a href="{% url 'logout' %}">Logout</a>
-    </nav>
-    <div class="row">
-        <div id="chat-side" class="chat-list col-lg-4">
-            <div id="chat-list">
-                {% if chats %}
-                    {% for c in chats %}
-                        <div id="chat-item-{{ c.id }}" class="chat-item" chat-id="{{ c.id }}">
-                            <span>{{ c.title }}</span>
-                        </div>
-                    {% endfor %}
-                {% else %}
-                    <h3>пока ничего нет</h3>
-                {% endif %}
-            </div>
-            <div id="chat-manage">
-                <button class="j-btn-create">Добавить</button>
-
-            </div>
-        </div>
-        <div class="col-lg-8">
-            <div id="message-side" class="container-lg"></div>
-            <form id="message-sender" action="" method="post">
-                {% csrf_token %}
-                {{ form }}
-                <input type="hidden" id="author-id" value="{{ author }}">
-                <input type="hidden" id="selected-chat-id" value="">
-                <button type="submit" class="submit-button">Отправить</button>
-            </form>
-        </div>
-        <div id="create-chat-dialog" class="d-box" style="display: none;">
-            <div>
-                <span>наименование</span>
-                <input id="chat-title">
-            </div>
-            <div id="user-list">
-            </div>
-            <button class="btn">Ok</button>
-            <button class="btn" onclick="document.getElementById('create-chat-dialog').style.display='none';">Отмена</button>
-        </div>
+  <div class="container">
+    <div class="menu">
+      <a href="{% url 'logout' %}">Logout</a>
     </div>
+    <div class="chat-list">
+      {% if chats %}
+        {% for c in chats %}
+          <div id="chat-list_item-{{ c.id }}" class="chat-list_item" chat-id="{{ c.id }}">
+            <h4>{{ c.title }}</h4>
+          </div>
+        {% endfor %}
+      {% else %}
+        <h3>пока ничего нет</h3>
+      {% endif %}
+    </div>
+    <div class="chat-manage">
+      <button id="chat-create" class="big-button">Добавить</button>
+      <button id="chat-destroy" class="big-button">Удалить</button>
+    </div>
+    <div class="message-list"></div>
+    <div class="message-sender">
+      <form id="message-sender" action="" method="post">
+        {% csrf_token %}
+        {{ form }}
+        <input type="hidden" id="author-id" value="{{ author }}">
+        <input type="hidden" id="selected-chat-id" value="">
+        <button type="submit" class="submit-button">Отправить</button>
+      </form>
+    </div>
+  </div>
 
+  <div id="create-chat-dialog" class="dialog-pad hidden">
+    <div class="dialog-box">
+      <form id="chat-creator">
+        {% csrf_token %}
+        <div>
+          <span>наименование</span>
+          <input id="chat-title" type="text" maxlength="30">
+        </div>
+        <div id="user-list"></div>
+        <button id="dialog-box__ok" class="btn" type="submit">Ok</button>
+        <button id="dialog-box__cancel" class="btn">Отмена</button>
+    </form>
+    </div>
+  </div>
 {% endblock content %}

@@ -1,4 +1,4 @@
 django
-django-filter
-python-dotenv
 djangorestframework
+channels[daphne]
+channels-redis
