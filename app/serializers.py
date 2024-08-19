@@ -19,8 +19,8 @@ class ChatSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Chat
-        fields = ['id', 'title', 'members']
-
+        fields = ['id', 'title', 'members', 'members_list']
+        
     def create(self, validated_data):
         if 'members' in self.initial_data:
             members = validated_data.pop('members')
@@ -58,6 +58,5 @@ class MessageSerializer(serializers.ModelSerializer):
 
     def to_representation(self, instance):
         data = super().to_representation(instance)
-        data['authorizedUser'] = self.context['request'].user.id
         data['dateCreation'] = instance.dateCreation.strftime("%d.%m.%Y %H:%M")
         return data

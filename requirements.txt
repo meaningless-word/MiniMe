@@ -2,3 +2,4 @@ django
 djangorestframework
 channels[daphne]
 channels-redis
+pillow

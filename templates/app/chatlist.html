@@ -12,7 +12,7 @@ Chats
     <div class="chat-list">
       {% if chats %}
         {% for c in chats %}
-          <div id="chat-list_item-{{ c.id }}" class="chat-list_item" chat-id="{{ c.id }}">
+          <div id="chat-list_item-{{ c.id }}" class="chat-list_item" chat-id="{{ c.id }}" members="{{ c.members_list }}">
             <h4>{{ c.title }}</h4>
           </div>
         {% endfor %}
@@ -38,16 +38,13 @@ Chats
 
   <div id="create-chat-dialog" class="dialog-pad hidden">
     <div class="dialog-box">
-      <form id="chat-creator">
-        {% csrf_token %}
-        <div>
-          <span>наименование</span>
-          <input id="chat-title" type="text" maxlength="30">
-        </div>
-        <div id="user-list"></div>
-        <button id="dialog-box__ok" class="btn" type="submit">Ok</button>
-        <button id="dialog-box__cancel" class="btn">Отмена</button>
-    </form>
+      <div>
+        <span>наименование</span>
+        <input id="chat-title" type="text" maxlength="30">
+      </div>
+      <div id="user-list"></div>
+      <button id="dialog-box__ok" class="btn">Ok</button>
+      <button id="dialog-box__cancel" class="btn">Отмена</button>
     </div>
   </div>
 {% endblock content %}
