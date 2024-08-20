@@ -12,4 +12,5 @@ router.register(r'message', views.MessageViewSet)
 urlpatterns = [
     path('', views.ChatListView.as_view(), name='home'),
     path('api/', include(router.urls), name='api'),
+    path('profile/', views.EditProfileView.as_view(), name='profile'),
 ]

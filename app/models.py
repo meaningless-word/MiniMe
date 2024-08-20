@@ -1,10 +1,24 @@
 from django.db import models
 from django.contrib.auth.models import User
+from django.core.files.storage import FileSystemStorage
+from django.conf import settings
+
+import os
+
+def image_path(instance, filename):
+    return os.path.join('images/profile/', instance.user.username, filename)
+
+class OverwriteStorage(FileSystemStorage):
+    def get_available_name(self, name, max_length):
+        if self.exists(name):
+            os.remove(os.path.join(settings.MEDIA_ROOT, name))
+        return name       
 
 
 class Profile(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
-    portrait = models.ImageField(upload_to="images/profile", default=None, null=True, blank=True)
+    portrait = models.ImageField(storage=OverwriteStorage(), upload_to=image_path, null=True, blank=True)
+    nickname = models.CharField(max_length=30, default=None, null=True, blank=True)
 
 
 class Chat(models.Model):
@@ -29,4 +43,3 @@ class Message(models.Model):
 
     def __str__(self):
         return f'from:{self.author.id} to_chat:{self.chat.id} [{self.text[:50]}'
-

@@ -1,5 +1,5 @@
 from django import forms
-from .models import Message
+from .models import Message, Profile
 
 
 class MessageForm(forms.ModelForm):
@@ -9,3 +9,15 @@ class MessageForm(forms.ModelForm):
         model = Message
         fields = ['text',]
 
+
+class ProfileForm(forms.ModelForm):
+    nickname = forms.CharField(label="Ник", max_length=30)
+    portrait = forms.ImageField(label="Аватар", required=False)
+
+    class Meta:
+        model = Profile
+        fields = ['nickname', 'portrait']
+
+        widgets = {
+            'portrait': forms.FileInput(attrs={'accept': 'image/*'}),
+        }

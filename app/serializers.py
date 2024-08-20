@@ -1,12 +1,13 @@
 from rest_framework import serializers
-from .models import Chat, Message
+from .models import Chat, Message, Profile
 from django.contrib.auth.models import User
 
 
 class UserSerializer(serializers.ModelSerializer):
+    profile = serializers.SlugRelatedField(many=False, read_only=True, slug_field='nickname')
     class Meta:
         model = User
-        fields = ['id', 'username']
+        fields = ['id', 'username', 'profile']
 
     def to_representation(self, instance):
         data = super().to_representation(instance)
@@ -51,10 +52,12 @@ class MessageSerializer(serializers.ModelSerializer):
     authorName = serializers.ReadOnlyField(source='author.username')
     dateCreation = serializers.DateTimeField(read_only=True)
     authorizedUser = serializers.ReadOnlyField(default=0, read_only=True)
+    nickname = serializers.ReadOnlyField(source='author.profile.nickname')
+    avatar = serializers.ReadOnlyField(source='author.profile.portrait.url')
 
     class Meta:
         model = Message
-        fields = ['id', 'text', 'author', 'authorName', 'chat', 'deleted', 'dateCreation', 'authorizedUser']
+        fields = ['id', 'text', 'author', 'authorName', 'chat', 'deleted', 'dateCreation', 'authorizedUser', 'nickname', 'avatar']
 
     def to_representation(self, instance):
         data = super().to_representation(instance)

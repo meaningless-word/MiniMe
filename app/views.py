@@ -1,5 +1,7 @@
 from django.contrib.auth.mixins import LoginRequiredMixin
-from django.views.generic import (ListView, )
+from django.contrib.auth.decorators import login_required
+from django.views.generic import (ListView, UpdateView,)
+from django.shortcuts import render
 from rest_framework import viewsets, permissions, status
 
 from django.contrib.auth.models import User
@@ -23,7 +25,9 @@ class ChatListView(LoginRequiredMixin, ListView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context['author'] = self.request.user.id
+        context['author'] = self.request.user
+        profile, creted = models.Profile.objects.get_or_create(user=self.request.user)  
+        context['profile'] = profile
         context['form'] = self.form_class
         return context
 
@@ -85,3 +89,12 @@ class MessageViewSet(viewsets.ModelViewSet):
             instance.save()
             return Response(status=status.HTTP_204_NO_CONTENT)
         return Response(status=status.HTTP_404_NOT_FOUND)
+
+class EditProfileView(LoginRequiredMixin, UpdateView):
+    model = models.Profile
+    form_class = forms.ProfileForm
+    template_name = 'app/profile.html'
+    success_url = '/'
+
+    def get_object(self, queryset=None):
+        return self.request.user.profile

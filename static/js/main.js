@@ -107,19 +107,23 @@ function showMessage(message) {
 // подготовка плашки сообщения
 function prepareMessage(m) {
   let message = document.createElement("div");
-  message.className = `message-panel ${
-    m.author == authorId.value ? "shift" : "unshift"
-  }`;
+  message.className = `message-panel ${m.author == authorId.value ? "shift" : "unshift"}`;
   message.id = `message-id-${m.id}`;
 
   let messageBox = document.createElement("div");
-  messageBox.className = `message-box ${
-    m.author == authorId.value ? "own-box" : "another-box"
-  }`;
+  messageBox.className = `message-box ${m.author == authorId.value ? "own-box" : "another-box"}`;
 
-  let author = document.createElement("span");
+  let author = document.createElement("div")
   author.className = "author-info";
-  author.appendChild(document.createTextNode(m.authorName));
+
+  let nickname = document.createElement("span");
+  nickname.appendChild(document.createTextNode(m.nickname ?? m.authorName));
+
+  let avatar = document.createElement("img");
+  avatar.src = m.avatar;
+
+  author.appendChild(avatar);
+  author.appendChild(nickname);
 
   let text = document.createElement("span");
   text.className = "message-text";
@@ -215,7 +219,7 @@ btnShowCreateChatDialog.addEventListener("click", () => {
     users.forEach((user) => {
       if (!user.itsMe) {
         s += `<div><input type="checkbox" id="user-${user.id}" name="chbUser" value="${user.username}" />`;
-        s += `<label for="user-${user.id}">${user.username}</label></div>`;
+        s += `<label for="user-${user.id}">${user.profile ?? user.username}</label></div>`;
       }
       const userList = document.getElementById("user-list");
       userList.innerHTML = s;

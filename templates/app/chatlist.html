@@ -7,7 +7,15 @@ Chats
 {% block content %}
   <div class="container">
     <div class="menu">
-      <a href="{% url 'logout' %}">Logout</a>
+      <div class="profile">
+        <div class="avatar">
+          {% if profile.portrait %}
+            <img src="{{ profile.portrait.url }}"/>
+          {% endif %}
+        </div>  
+        <h2 class="login"><a href="{% url 'profile' %}">{{ profile.nickname|default_if_none:author.username }}</a></h2>
+      </div>
+      <a href="{% url 'logout' %}" class="button-style">Выйти</a>
     </div>
     <div class="chat-list">
       {% if chats %}
@@ -29,7 +37,7 @@ Chats
       <form id="message-sender" action="" method="post">
         {% csrf_token %}
         {{ form }}
-        <input type="hidden" id="author-id" value="{{ author }}">
+        <input type="hidden" id="author-id" value="{{ author.id }}">
         <input type="hidden" id="selected-chat-id" value="">
         <button type="submit" class="submit-button">Отправить</button>
       </form>
