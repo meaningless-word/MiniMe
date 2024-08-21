@@ -11,16 +11,36 @@
 
 ### **Клонирование**
 
-1.  В папке, куда будет помещен проект выполнить команду   
-    _**gin clone**_ [_**https://github.com/meaningless-word/MiniMe.git**_](https://github.com/meaningless-word/MiniMe.git)  
-    ![](https://github.com/meaningless-word/MiniMe/blob/master/readme.images/1.git_clone.png)
+### В папке, куда будет помещен проект выполнить команду   
+_**gin clone**_ [_**https://github.com/meaningless-word/MiniMe.git**_](https://github.com/meaningless-word/MiniMe.git)  
+![](https://github.com/meaningless-word/MiniMe/blob/master/readme.images/1.git_clone.png)
+
+### **Подготовка виртуального окружения**
+
+Войти в папку проекта и выполнить команду создания виртуального окружения  
+_**python -m venv .venv**_  
+_**![](https://github.com/meaningless-word/MiniMe/blob/master/readme.images/2.venv.png)**_
+
+Запустить скрипт для активации  
+_**.vemv\\scripts\\activate**_  
+![](https://github.com/meaningless-word/MiniMe/blob/master/readme.images/3.venv_activate.png)
+
+Установить зависимости  
+_**pip install -r requirements.txt**_  
+_**![](https://github.com/meaningless-word/MiniMe/blob/master/readme.images/4.pip_install.png)**_  
+...  
+![](https://github.com/meaningless-word/MiniMe/blob/master/readme.images/4.pip_install_end.png)
+
+Можно проапгрейдить установщик  
+_**python.exe -m pip install --upgrade pip**_  
+![](https://github.com/meaningless-word/MiniMe/blob/master/readme.images/5.pip_upgrade.png)
 
 ### **Для запуска....**
 
 1.  После клонирования в папке проекта выполнить команду создания виртуального окружения  
     _**python -m venv .venv**_
 2.  Выполнить установку пакетов библиотек  
-    _**pip install -r requirements.txt**_
+     
 3.  Для работы проекта понадобится Redis. Я использоваk альтернативу - хранилищем данных [Memurai](https://www.memurai.com/get-memurai/), совместимым с Redis и отлично работающие под Windows
 4.  Заупск - **python manage.py runserver**
 
