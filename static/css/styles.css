@@ -81,7 +81,7 @@ ul>li {
 
 .message-list {
   grid-area: m;
-  background-color: #0a2c26;
+  background-color: #5f948a;
   overflow-y: auto;
   max-height: calc(100vh - 120px);
 }
