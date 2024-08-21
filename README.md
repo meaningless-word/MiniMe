@@ -17,7 +17,9 @@ _**gin clone**_ [_**https://github.com/meaningless-word/MiniMe.git**_](https://g
 
 ### **Подготовка виртуального окружения**
 
-Войти в папку проекта и выполнить команду создания виртуального окружения  
+Войти в папку проекта   
+_**cd MiniMe**_  
+и выполнить команду создания виртуального окружения  
 _**python -m venv .venv**_  
 _**![](https://github.com/meaningless-word/MiniMe/blob/master/readme.images/2.venv.png)**_
 
@@ -40,11 +42,11 @@ _**python.exe -m pip install --upgrade pip**_
 
 ### **Установка Redis**
 
-### Для работы проекта понадобится Redis. Я воспользовался альтернативой - хранилищем данных [Memurai](https://www.memurai.com/get-memurai/), совместимым с Redis и отлично работающим под Windows.  
+Для работы проекта понадобится Redis. Я воспользовался альтернативой - хранилищем данных [Memurai](https://www.memurai.com/get-memurai/), совместимым с Redis и отлично работающим под Windows.  
 ![](https://github.com/meaningless-word/MiniMe/blob/master/readme.images/7.memurai.png)  
 ![](https://github.com/meaningless-word/MiniMe/blob/master/readme.images/7.memurai_download.png)
 
-После установки потребуется перезагрузка, чтобы слуюба стартовала  
+После установки потребуется перезагрузка, чтобы служба стартовала  
 ![](https://github.com/meaningless-word/MiniMe/blob/master/readme.images/7.memurai_service.png)
 
 Для проверки работы службы можно воспользоваться клиентом Redis'а, либо клиентом мемурая  
@@ -62,7 +64,7 @@ _**python.exe -m pip install --upgrade pip**_
 
 В приложении зарегистрированы следующие пользователи:
 
-<table><tbody><tr><td><strong>login</strong></td><td><strong>password</strong></td></tr><tr><td>admin</td><td>admin</td></tr><tr><td>user1</td><td>1</td></tr><tr><td>user2</td><td>2</td></tr><tr><td>user3</td><td>3</td></tr><tr><td>user4</td><td>4</td></tr></tbody></table>
+<table><tbody><tr><td><h4><i><strong>login</strong></i></h4></td><td><h4><i><strong>password</strong></i></h4></td></tr><tr><td>admin</td><td>admin</td></tr><tr><td>user1</td><td>1</td></tr><tr><td>user2</td><td>2</td></tr><tr><td>user3</td><td>3</td></tr><tr><td>user4</td><td>4</td></tr></tbody></table>
 
 После входа откроется web-приложение на первом из списка чатов авторизованного пользователя.
 
