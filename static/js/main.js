@@ -6,6 +6,8 @@ const formMessageSender = document.querySelector("#message-sender");
 const btnShowCreateChatDialog = document.querySelector("#chat-create");
 const messageEditor = document.querySelector('textarea[name="text"]');
 const formChatCreator = document.querySelector("#chat-creator");
+const btnShowRecruitChatDialog = document.querySelector("#recruit-chat");
+const dialog = document.querySelector("#manage-chat-dialog");
 let selectedChat = chatContainer.firstElementChild;
 let chatSocket;
 // 
@@ -41,7 +43,6 @@ function wsOpen() {
 
     chatSocket.onmessage = function(e) {
       const data = JSON.parse(e.data);
-      console.log(data);
       switch(data.message.type) {
         case 'message':
           switch(data.message.action) {
@@ -55,19 +56,34 @@ function wsOpen() {
           }
           break;
         case 'chat':
+          const chat = document.getElementById(`chat-list_item-${data.message.parcel.id}`);
           switch (data.message.action) {
             case "create":
                 const members = data.message.parcel.members;
-                if (members.find((el) => el == authorId.value)) {
+                if (members.indexOf(parseInt(authorId.value)) > -1) {
                   showChat(data.message.parcel);
+                  if (data.message.initiator == authorId.value) {firstDefault();} 
                 }
               break;
             case "delete":
-              const chat = document.getElementById(`chat-list_item-${data.message.parcel.id}`);
               if (chat) {
                 chat.remove();
-                firstDefault();
+                if (!selectedChat) {firstDefault();}
               } 
+              break;
+            case "update":
+              console.log(data);
+              if (chat) {
+                chat.innerHTML = `<h4>${data.message.parcel.title}</h4>`;
+                chat.setAttribute('members', data.message.parcel.members_list);
+              }
+              const meInMembers = data.message.parcel.members.indexOf(parseInt(authorId.value));
+              if ((meInMembers > -1) && (!chat)) {
+                showChat(data.message.parcel);
+              } 
+              if ((meInMembers == -1) && (chat)) {
+                chat.remove();
+              }
               break;
           }          
           break;
@@ -134,13 +150,9 @@ function prepareMessage(m) {
   timeInfo.appendChild(document.createTextNode(m.dateCreation));
   let buttonDelete = document.createElement("button");
   buttonDelete.className = "tiny-button";
-  buttonDelete.style.display = `${
-    m.author == authorId.value ? "block" : "none"
-  }`;
+  buttonDelete.style.display = `${m.author == authorId.value ? "block" : "none"}`;
   buttonDelete.appendChild(document.createTextNode("удалить"));
-  buttonDelete.addEventListener("click", () => {
-    deleteMessage(m.id);
-  });
+  buttonDelete.addEventListener("click", () => {deleteMessage(m.id);});
   timeInfo.appendChild(buttonDelete);
 
   messageBox.appendChild(author);
@@ -171,7 +183,7 @@ function deleteMessage(id) {
   });
 }
 // отправка сообщения
-function sendMessage() {
+function sendMessage(messageText) {
   if (selectedChatId.value.length == 0) {
     alert("Необходмо выбрать чат прежде, чем отправлять сообщение");
   } else {
@@ -185,8 +197,8 @@ function sendMessage() {
       },
       credentials: "include",
       body: JSON.stringify({
-        text: messageEditor.value,
-        author: document.getElementById("author-id").value,
+        text: messageText,
+        author: authorId.value,
         chat: selectedChatId.value,
         deleted: false,
       }),
@@ -205,29 +217,52 @@ function sendMessage() {
 
 // крепление обрвботчика к сабмиту формы отправки сообщения
 formMessageSender.onsubmit = function (ev) {
-  sendMessage();
+  sendMessage(messageEditor.value);
   messageEditor.value = "";
   return false;
 };
 
-// крепление обоработчика к кнопке вызова диалога создания чата
-btnShowCreateChatDialog.addEventListener("click", () => {
-  fetch(`/api/users`)
+// крепление обоработчика к кнопке создания чата
+btnShowCreateChatDialog.addEventListener("click", (ev) => {
+  const m = [parseInt(authorId.value)];
+  fillUserCheckList(m); 
+
+  document.querySelector('input[id="chat-title"]').value = "";
+
+  dialog.setAttribute("target", ev.target.id);
+  dialog.setAttribute("members", m);
+  dialog.classList.remove("hidden");
+});
+
+// крепление обоработчика к кнопке пополнения списка чата
+btnShowRecruitChatDialog.addEventListener("click", (ev) => {
+  const m = getMembersList();
+  fillUserCheckList(m); 
+
+  document.querySelector('input[id="chat-title"]').value = document.querySelector(`div[chat-id="${selectedChatId.value}"]`).textContent.trim();
+
+  dialog.setAttribute("target", ev.target.id);
+  dialog.setAttribute("members", m);
+  dialog.classList.remove("hidden");
+});
+
+// заполнение чек-листа пользователями для диалога добавления/пополнения
+function fillUserCheckList(exclude) {
+  fetch(`/api/users/`)
   .then((response) => response.json())
   .then((users) => {
     let s = "";
     users.forEach((user) => {
-      if (!user.itsMe) {
+      if (exclude.indexOf(user.id) == -1) {
         s += `<div><input type="checkbox" id="user-${user.id}" name="chbUser" value="${user.username}" />`;
         s += `<label for="user-${user.id}">${user.profile ?? user.username}</label></div>`;
       }
-      const userList = document.getElementById("user-list");
-      userList.innerHTML = s;
+      document.getElementById("user-list").innerHTML = s;
     });
   })
   .catch((error) => console.error("Error:", error));
-  document.querySelector("#create-chat-dialog").classList.remove("hidden");
-});
+}
+
 
 // крепление обработчика к кнопке удаления чата
 document.querySelector("#chat-destroy").addEventListener("click", () => {
@@ -243,75 +278,145 @@ document.querySelector("#chat-destroy").addEventListener("click", () => {
       },
       credentials: "include",
     }).then(() => {
-      const chat = document.getElementById(`chat-list_item-${selectedChatId.value}`);
-      const m_attr = chat.getAttribute('members') ?? '';
-      const m = m_attr.replaceAll(' ', '').replaceAll('[', '').replaceAll(']', '').split(',');
       chatSocket.send(
         JSON.stringify({
           type: "chat",
           action: "delete",
-          parcel: { id: selectedChatId.value, members: m }
+          initiator: authorId.value,
+          parcel: { id: selectedChatId.value, members: getMembersList() }
         })
       );
     });    
   }   
 });
 
-// крепление обрвботчика к кнопке отмены создания чата
+
+// получение списка участников выбранного чата
+function getMembersList() {
+  const chat_members = document.getElementById(`chat-list_item-${selectedChatId.value}`).getAttribute("members") ?? "";
+  const m = chat_members.replaceAll(' ', '').replaceAll('[', '').replaceAll(']', '').split(',').map((item) => parseInt(item));
+  return m;
+}
+
+// крепление обработчика к кнопке отмены создания чата
 document.querySelector("#dialog-box__cancel").addEventListener("click", (ev) => {
-  document.querySelector("#create-chat-dialog").classList.add("hidden");
-  ev. false;
+  dialog.classList.add("hidden");
 });
 
-// создания чата
-function createChat() {
-  const chatName = document.querySelector('input[id="chat-title"]').value;
+// проверка валидности данных чата
+function validateChat() {
+  const result = {
+    chatName: document.querySelector('input[id="chat-title"]').value,
+    checked: dialog.getAttribute('members').split(","),
+    recruited: [],
+    currentChatName: document.querySelector(`div[chat-id="${selectedChatId.value}"]`)?.textContent.trim()
+  };
+
   const checkBoxes = document.getElementsByName("chbUser");
-  const checked = [];
   checkBoxes.forEach((item, i) => {
     if (item.checked) {
-      checked.push(item.id.replace("user-", ""));
+      result.checked.push(item.id.replace("user-", ""));
+      result.recruited.push(document.querySelector(`label[for="${item.id}"]`).textContent);
     }
   });
-  if (checked.length == 0) {
-    alert("Необходимо добавить хотя бы одного собеседника");
-  } else if (chatName.length == 0) {
-    alert("Необходимо указать наименование");
-  } else {
-    const csrfToken = document.querySelector('input[name="csrfmiddlewaretoken"]').value;
-    checked.push(authorId.value);
 
-    fetch(`/api/chat/`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        "X-CSRFToken": csrfToken,
-      },
-      credentials: "include",
-      body: JSON.stringify({
-        title: chatName,
-        members: checked,
-      }),
-    })
-    .then((response) => response.json())
-    .then((json) => {
-      chatSocket.send(
-        JSON.stringify({
-          type: "chat",
-          action: "create",
-          parcel: json
-        })
-      );      
-    })
-    .catch((error) => console.error("Error:", error));
+  if (result.checked.length < 2) {
+    alert("Необходимо добавить хотя бы одного собеседника");
+    return {}; 
+  } else if (result.chatName.length == 0) {
+    alert("Необходимо указать наименование");
+    return {};
+  } else {
+    return result;
   }
 }
 
-// крепление обработчика к сабмиту формы создания чата
+// создание чата
+function createChat(title, members) {
+  const csrfToken = document.querySelector('input[name="csrfmiddlewaretoken"]').value;
+
+  fetch(`/api/chat/`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      "X-CSRFToken": csrfToken,
+    },
+    credentials: "include",
+    body: JSON.stringify({
+      title: title,
+      members: members,
+    }),
+  })
+  .then((response) => response.json())
+  .then((json) => {
+    chatSocket.send(
+      JSON.stringify({
+        type: "chat",
+        action: "create",
+        initiator: authorId.value,
+        parcel: json
+      })
+    );      
+  })
+  .catch((error) => console.error("Error:", error));
+  return true;
+}
+
+// модификация чата
+function updateChat(title, members) {
+  const csrfToken = document.querySelector('input[name="csrfmiddlewaretoken"]').value;
+
+  fetch(`/api/chat/${selectedChatId.value}/`, {
+    method: "PUT",
+    headers: {
+      "Content-Type": "application/json",
+      "X-CSRFToken": csrfToken
+    },
+    credentials: "include",
+    body: JSON.stringify({
+      id: selectedChatId.value,
+      title: title,
+      members: members
+    })
+  })
+  .then((response) => response.json())
+  .then((json) => {
+    chatSocket.send(
+      JSON.stringify({
+        type: "chat",
+        action: "update",
+        initiator: authorId.value,
+        parcel: json
+      })
+    );
+  })
+  .catch((error) => console.error("Error:", error));
+  return true;
+}
+
+// крепление обработчика к кнопке подтверждения создания/пополнения чата
 document.querySelector("#dialog-box__ok").addEventListener("click", (ev) => {
-  createChat();
-  document.querySelector("#create-chat-dialog").classList.add("hidden");
+  let result = false;
+  const validated = validateChat();
+  if (Object.keys(validated).length > 0) {
+    switch(dialog.getAttribute('target')) {
+      case "chat-create": 
+        result = createChat(validated.chatName, validated.checked); 
+        break;
+      case "recruit-chat": 
+        let messageText = validated.recruited.length > 0 ? `В чат добавлены пользователи: ${validated.recruited.join(", ")}.` : "";
+        messageText += validated.chatName != validated.currentChatName ? `Наименование чата изменено на "${validated.chatName}".` : "";
+
+        if (messageText.length > 0) {
+          result = updateChat(validated.chatName, validated.checked); 
+          sendMessage(messageText);
+        }
+        break;
+    }
+  }
+  if (result) dialog.classList.add("hidden");
 });
+
 
 // отображение плашки чата
 function showChat(chat) {
@@ -319,7 +424,6 @@ function showChat(chat) {
   if (!chatElement) {
     const newChat = chatContainer.insertBefore(prepareChat(chat), chatContainer.firstChild);
     newChat.addEventListener("click", selectChat);
-    newChat.click();
   } 
 }
 // подготовка плашки чата
@@ -328,15 +432,34 @@ function prepareChat(c) {
   chatItem.id = `chat-list_item-${c.id}`;
   chatItem.className = "chat-list_item";
   chatItem.setAttribute("chat-id", c.id);
-  chatItem.setAttribute("members", `[${c.members_list}]`);
+  chatItem.setAttribute("members", c.members_list);
   let chatTitle = document.createElement("h4");
   chatTitle.appendChild(document.createTextNode(c.title));
   chatItem.appendChild(chatTitle);
   return chatItem;
 }
 
-messageContainer.addEventListener('keyup', (e) => {
-  if (e.ctrlKey && e.keyCode == 13) {
-    console.log("Ctrl+Enter");
+// отправка сообщений по нажатию Ctrl+Enter
+messageEditor.addEventListener('keydown', (e) => {
+  if (e.ctrlKey && e.keyCode === 13) {
+    document.querySelector("#message-sender-button").click();
   }  
 });
+
+
+// крепление обработчика к кнопке покидания чата
+document.querySelector("#leave-chat").addEventListener("click", (ev) => {
+    const members = getMembersList();
+    const chat = document.querySelector(`div[chat-id="${selectedChatId.value}"]`);
+    const title = chat.textContent.trim();
+    const meInMembers = members.indexOf(parseInt(authorId.value));
+
+    if (meInMembers > -1) {
+      members.splice(meInMembers, 1);
+      sendMessage('Покидаю чат');
+      updateChat(title, members);
+    }
+  
+})
+
+

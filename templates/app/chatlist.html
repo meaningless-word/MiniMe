@@ -24,8 +24,6 @@ Chats
             <h4>{{ c.title }}</h4>
           </div>
         {% endfor %}
-      {% else %}
-        <h3>пока ничего нет</h3>
       {% endif %}
     </div>
     <div class="chat-manage">
@@ -39,12 +37,14 @@ Chats
         {{ form }}
         <input type="hidden" id="author-id" value="{{ author.id }}">
         <input type="hidden" id="selected-chat-id" value="">
-        <button type="submit" class="submit-button">Отправить</button>
+        <button type="submit" id="message-sender-button" class="submit-button">Отправить</button>
       </form>
+      <button id="leave-chat" class="submit-button">Покинуть чат</button>
+      <button id="recruit-chat" class="submit-button">Добавить пользователя</button>
     </div>
   </div>
 
-  <div id="create-chat-dialog" class="dialog-pad hidden">
+  <div id="manage-chat-dialog" class="dialog-pad hidden">
     <div class="dialog-box">
       <div>
         <span>наименование</span>

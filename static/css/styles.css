@@ -4,6 +4,50 @@ body {
   background-color: #0a0b2c;
 }
 
+input[type="text"],input[type="password"],input[type="radio"] {
+    font-size: 18px;
+    height: 20px;
+    padding: 5px;
+    margin: 10px;
+    border-radius: 4px;
+    border: 1px solid var(--pale-border);
+    box-shadow: 0px 0px 10px 0px rgba(142, 197, 204, 0.897); 
+}
+
+input[type="submit"]{
+  cursor: pointer;
+  font-family: Arial, Helvetica, sans-serif;
+  padding: 10px;
+  background-color: #007bff;
+  color: #fff;
+  border: none;
+  border-radius: 5px;
+}
+
+p>label {
+  font-family: Arial, Helvetica, sans-serif;
+  font-size: 18px;
+  color:#44bda7;
+  margin: 10px;
+}
+
+ul>li {
+  font-size: 18px;
+  color:#44bda7;
+}
+
+.helptext {
+  color:#ccc;
+  font-size: 14px;
+}
+
+.radiolist {
+  label {
+    font-size: 18px;
+    color:#44bda7;
+  }
+}
+
 .container {
   top: 0;
   left: 0;
@@ -58,11 +102,15 @@ body {
   min-height: 110px;
   align-content: center;
   display: flex;
-  align-items: stretch;
-  justify-content: stretch;
+  flex-direction: row;
+  flex-wrap: nowrap;
+  align-items: center;
+  justify-content: flex-start;
+  column-gap: 15px;
 
   textarea {
     width: 100%;
+    font-family: Arial, Helvetica, sans-serif;
   }
 }
 

@@ -28,8 +28,6 @@ class ChatSerializer(serializers.ModelSerializer):
         else:
             members = []
 
-        members.append(self.context['request'].user)
-
         chat = Chat.objects.create(**validated_data)
         chat.members.add(*set([m.id for m in members]))
         return chat
